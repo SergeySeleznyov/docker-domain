@@ -14,20 +14,20 @@ services:
     hostname: DOMAIN-CONTROLLER1
     privileged: true
     environment:
-      REALM: DGS.NET
-      DOMAIN: DGS
+      REALM: DOMAIN1.NET
+      DOMAIN: DOMAIN1
       ADMIN_PASS: Passw0rd
       DNS_FORWARDER: 8.8.8.8
       BIND_NETWORK_INTERFACES: false
-    dns_search: dgs.net
+    dns_search: domain1.net
     dns:
       - 172.16.238.10
       - 172.16.238.20
       - 172.16.238.30
     extra_hosts:
-      - "DOMAIN-CONTROLLER1 DOMAIN-CONTROLLER1.dgs.net:172.16.238.10"
-      - "apache-kbr-proxy apache-kbr-proxy.dgs.net:172.16.238.20"
-      - "react-nginx react-nginx.dgs.net:172.16.238.30"
+      - "DOMAIN-CONTROLLER1 DOMAIN-CONTROLLER1.domain1.net:172.16.238.10"
+      - "apache-kbr-proxy apache-kbr-proxy.domain1.net:172.16.238.20"
+      - "react-nginx react-nginx.domain1.net:172.16.238.30"
     command: bash -c "samba-domain-provision && samba -F"
     volumes:
       - domain-controller1-local-samba:/usr/local/samba
@@ -45,21 +45,22 @@ services:
     hostname: apache-kbr-proxy
     privileged: true
     environment:
-      REALM: DGS.NET
-      DOMAIN: DGS
+      REALM: DOMAIN1.NET
+      DOMAIN: DOMAIN1
       ADMIN_PASS: Passw0rd
       DNS_FORWARDER: 8.8.8.8
       BIND_NETWORK_INTERFACES: false
-    dns_search: dgs.net
+      DC_HOSTNAME: DOMAIN-CONTROLLER1
+    dns_search: domain1.net
     dns:
       - 172.16.238.10
       - 172.16.238.20
       - 172.16.238.30
     extra_hosts:
-      - "DOMAIN-CONTROLLER1 DOMAIN-CONTROLLER1.dgs.net:172.16.238.10"
-      - "apache-kbr-proxy apache-kbr-proxy.dgs.net:172.16.238.20"
-      - "react-nginx react-nginx.dgs.net:172.16.238.30"
-    # command: bash -c "samba-domain-join DOMAIN-CONTROLLER1 && samba -F"
+      - "DOMAIN-CONTROLLER1 DOMAIN-CONTROLLER1.domain1.net:172.16.238.10"
+      - "apache-kbr-proxy apache-kbr-proxy.domain1.net:172.16.238.20"
+      - "react-nginx react-nginx.domain1.net:172.16.238.30"
+    # command: bash -c "samba-domain-join"
     networks:
       static-network:
         ipv4_address: 172.16.238.20
@@ -74,21 +75,22 @@ services:
     hostname: react-nginx
     # privileged: true
     environment:
-      REALM: DGS.NET
-      DOMAIN: DGS
+      REALM: DOMAIN1.NET
+      DOMAIN: DOMAIN1
       ADMIN_PASS: Passw0rd
       DNS_FORWARDER: 8.8.8.8
       BIND_NETWORK_INTERFACES: false
-    dns_search: dgs.net
+      DC_HOSTNAME: DOMAIN-CONTROLLER1
+    dns_search: domain1.net
     dns:
       - 172.16.238.10
       - 172.16.238.20
       - 172.16.238.30
     extra_hosts:
-      - "DOMAIN-CONTROLLER1 DOMAIN-CONTROLLER1.dgs.net:172.16.238.10"
-      - "apache-kbr-proxy apache-kbr-proxy.dgs.net:172.16.238.20"
-      - "react-nginx react-nginx.dgs.net:172.16.238.30"
-    # command: bash -c "samba-domain-join DOMAIN-CONTROLLER1 && samba -F"
+      - "DOMAIN-CONTROLLER1 DOMAIN-CONTROLLER1.domain1.net:172.16.238.10"
+      - "apache-kbr-proxy apache-kbr-proxy.domain1.net:172.16.238.20"
+      - "react-nginx react-nginx.domain1.net:172.16.238.30"
+    # command: bash -c "samba-domain-join"
     networks:
       static-network:
         ipv4_address: 172.16.238.30
