@@ -1,3 +1,23 @@
-FROM httpd:2.4
+FROM httpd:2.4-bullseye
 
-RUN cat /etc/os-release
+# RUN cat /etc/os-release
+
+RUN apt update && apt upgrade -y && \
+  DEBIAN_FRONTEND=noninteractive \
+  apt install \
+    samba \
+    krb5-user \
+    netcat iputils-ping iproute2 \
+    mc tmux  \
+    -y \
+  && apt clean autoclean \
+  && apt autoremove -y
+
+RUN rm /etc/samba/smb.conf \
+    && apt-get -f install
+
+RUN mkdir -p /usr/local/samba/private/ \
+    && cp /etc/krb5.conf /usr/local/samba/private/
+
+RUN mkdir -p /usr/local/sbin
+COPY samba-utils /usr/local/sbin
