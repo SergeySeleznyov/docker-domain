@@ -23,7 +23,7 @@ services:
     dns:
       - 172.16.238.10
       - 172.16.238.20
-      - 172.16.238.30      
+      - 172.16.238.30
     extra_hosts:
       - "DOMAIN-CONTROLLER1 DOMAIN-CONTROLLER1.dgs.net:172.16.238.10"
       - "apache-kbr-proxy apache-kbr-proxy.dgs.net:172.16.238.20"
@@ -91,7 +91,7 @@ services:
     # command: bash -c "samba-domain-join DOMAIN-CONTROLLER1 && samba -F"
     networks:
       static-network:
-        ipv4_address: 172.16.238.30  
+        ipv4_address: 172.16.238.30
 
 volumes:
   domain-controller1-local-samba:
