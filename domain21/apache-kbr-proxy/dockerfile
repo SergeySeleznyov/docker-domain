@@ -2,22 +2,32 @@ FROM httpd:2.4-bullseye
 
 # RUN cat /etc/os-release
 
+# Install samba, kerberos and required utils
 RUN apt update && apt upgrade -y && \
   DEBIAN_FRONTEND=noninteractive \
   apt install \
     samba \
     krb5-user \
-    netcat iputils-ping iproute2 \
-    mc tmux  \
-    -y \
-  && apt clean autoclean \
+    netcat iputils-ping iproute2 -y
+
+# Install some dev-useful tools
+RUN apt install mc tmux -y
+
+# clean up
+RUN apt clean autoclean \
   && apt autoremove -y
 
+# TODO find a better solution
+# Workaround default smb.conf issue
 RUN rm /etc/samba/smb.conf \
     && apt-get -f install
 
+# TODO find a better solution
+# Copy krb5.conf before it will be done by 'update-etc-files' script
 RUN mkdir -p /usr/local/samba/private/ \
     && cp /etc/krb5.conf /usr/local/samba/private/
 
+# Copy samba scripts
 RUN mkdir -p /usr/local/sbin
 COPY samba-utils /usr/local/sbin
+WORKDIR /usr/local/sbin
