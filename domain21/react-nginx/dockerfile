@@ -7,13 +7,13 @@ FROM node:lts AS development
 WORKDIR /app
 
 # 
-COPY ./react-app/package.json /app/package.json
-COPY ./react-app/package-lock.json /app/package-lock.json
+COPY ./react-nginx/react-app/package.json /app/package.json
+COPY ./react-nginx/react-app/package-lock.json /app/package-lock.json
 
 # Same as npm install
 RUN npm ci
 
-COPY ./react-app /app
+COPY ./react-nginx/react-app /app
 
 ENV CI=true
 ENV PORT=3000
@@ -46,20 +46,38 @@ FROM nginx
 
 RUN cat /etc/os-release
 
-# Install soft for domain client
+# Install samba, kerberos and required utils
 RUN apt update && apt upgrade -y && \
   DEBIAN_FRONTEND=noninteractive \
   apt install \
-    samba-dc \
-    krb5 -y \
-  && apt clean autoclean \
+    samba \
+    krb5-user \
+    netcat iputils-ping iproute2 -y
+
+# Install some dev-useful tools
+RUN apt install mc tmux -y
+
+# clean up
+RUN apt clean autoclean \
   && apt autoremove -y
 
-RUN [“mkdir”, “-p”, “/usr/local/sbin”]
+# TODO find a better solution
+# Workaround default smb.conf issue
+RUN rm /etc/samba/smb.conf \
+    && apt-get -f install
+
+# TODO find a better solution
+# Copy krb5.conf before it will be done by 'update-etc-files' script
+RUN mkdir -p /usr/local/samba/private/ \
+    && cp /etc/krb5.conf /usr/local/samba/private/
+
+# Copy samba scripts
+RUN mkdir -p /usr/local/sbin
 COPY samba-utils /usr/local/sbin
+WORKDIR /usr/local/sbin
 
 # Copy config nginx
-COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./react-nginx/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 WORKDIR /usr/share/nginx/html
 

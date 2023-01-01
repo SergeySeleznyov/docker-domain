@@ -1,8 +1,8 @@
 version: "3.8"
 
 services:
-  dc1:
-    restart: unless-stopped
+  domain-controller1:
+    # restart: unless-stopped
     build:
       context: .
       dockerfile: ./domain-controller/dockerfile
@@ -10,8 +10,8 @@ services:
         SMB_VERSION: "${SMB_VERSION:-latest}"
     # stdin_open: true # docker run -i
     # tty: true        # docker run -t
-    container_name: dc1
-    hostname: DC1
+    container_name: domain-controller1
+    hostname: DOMAIN-CONTROLLER1
     privileged: true
     environment:
       REALM: DGS.NET
@@ -25,18 +25,19 @@ services:
       - 172.16.238.20
       - 172.16.238.30      
     extra_hosts:
-      - "DC1 DC1.dgs.net:172.16.238.10"
+      - "DOMAIN-CONTROLLER1 DOMAIN-CONTROLLER1.dgs.net:172.16.238.10"
       - "apache-kbr-proxy apache-kbr-proxy.dgs.net:172.16.238.20"
       - "react-nginx react-nginx.dgs.net:172.16.238.30"
-    command: bash -c "samba-domain-provision && samba -F"
+    # command: bash -c "samba-domain-provision && samba -F"
     volumes:
-      - dc1-local-samba:/usr/local/samba
+      - domain-controller1-local-samba:/usr/local/samba
     networks:
       static-network:
         ipv4_address: 172.16.238.10
 
   apache-kbr-proxy:
-    restart: unless-stopped
+    depends_on:
+      - domain-controller1
     build:
       context: .
       dockerfile: apache-kbr-proxy/dockerfile
@@ -55,37 +56,45 @@ services:
       - 172.16.238.20
       - 172.16.238.30
     extra_hosts:
-      - "DC1 DC1.dgs.net:172.16.238.10"
+      - "DOMAIN-CONTROLLER1 DOMAIN-CONTROLLER1.dgs.net:172.16.238.10"
       - "apache-kbr-proxy apache-kbr-proxy.dgs.net:172.16.238.20"
       - "react-nginx react-nginx.dgs.net:172.16.238.30"
-    # command: bash -c "samba-domain-join DC1 && samba -F"
+    # command: bash -c "samba-domain-join DOMAIN-CONTROLLER1 && samba -F"
     networks:
       static-network:
         ipv4_address: 172.16.238.20
 
-  # react-nginx:
-  #   restart: unless-stopped
-  #   build:
-  #     context: .
-  #     dockerfile: react-nginx/dockerfile
-  #   container_name: react-nginx
-  #   hostname: react-nginx
-  #   dns_search: dgs.net
-  #   dns:
-  #     - 172.16.238.10
-  #     - 172.16.238.20
-  #     - 172.16.238.30
-  #   extra_hosts:
-  #     - "DC1 DC1.dgs.net:172.16.238.10"
-  #     - "apache-kbr-proxy apache-kbr-proxy.dgs.net:172.16.238.20"
-  #     - "react-nginx react-nginx.dgs.net:172.16.238.30"
-  #   # command: bash -c "samba-domain-join DC1 && samba -F"
-  #   networks:
-  #     static-network:
-  #       ipv4_address: 172.16.238.30  
+  react-nginx:
+    depends_on:
+      -  domain-controller1
+    build:
+      context: .
+      dockerfile: react-nginx/dockerfile
+    container_name: react-nginx
+    hostname: react-nginx
+    privileged: true
+    environment:
+      REALM: DGS.NET
+      DOMAIN: DGS
+      ADMIN_PASS: Passw0rd
+      DNS_FORWARDER: 8.8.8.8
+      BIND_NETWORK_INTERFACES: false
+    dns_search: dgs.net
+    dns:
+      - 172.16.238.10
+      - 172.16.238.20
+      - 172.16.238.30
+    extra_hosts:
+      - "DOMAIN-CONTROLLER1 DOMAIN-CONTROLLER1.dgs.net:172.16.238.10"
+      - "apache-kbr-proxy apache-kbr-proxy.dgs.net:172.16.238.20"
+      - "react-nginx react-nginx.dgs.net:172.16.238.30"
+    # command: bash -c "samba-domain-join DOMAIN-CONTROLLER1 && samba -F"
+    networks:
+      static-network:
+        ipv4_address: 172.16.238.30  
 
 volumes:
-  dc1-local-samba:
+  domain-controller1-local-samba:
 
 networks:
   static-network:
