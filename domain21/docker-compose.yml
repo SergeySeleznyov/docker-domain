@@ -28,7 +28,7 @@ services:
       - "DOMAIN-CONTROLLER1 DOMAIN-CONTROLLER1.dgs.net:172.16.238.10"
       - "apache-kbr-proxy apache-kbr-proxy.dgs.net:172.16.238.20"
       - "react-nginx react-nginx.dgs.net:172.16.238.30"
-    # command: bash -c "samba-domain-provision && samba -F"
+    command: bash -c "samba-domain-provision && samba -F"
     volumes:
       - domain-controller1-local-samba:/usr/local/samba
     networks:
@@ -43,7 +43,7 @@ services:
       dockerfile: apache-kbr-proxy/dockerfile
     container_name: apache-kbr-proxy
     hostname: apache-kbr-proxy
-    # privileged: true
+    privileged: true
     environment:
       REALM: DGS.NET
       DOMAIN: DGS
@@ -72,7 +72,7 @@ services:
       dockerfile: react-nginx/dockerfile
     container_name: react-nginx
     hostname: react-nginx
-    privileged: true
+    # privileged: true
     environment:
       REALM: DGS.NET
       DOMAIN: DGS
