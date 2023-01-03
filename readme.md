@@ -23,3 +23,9 @@ In opened terminal run: ```/usr/local/sbin/samba-domain-join```
 In opened terminal run: ```/usr/local/sbin/samba-domain-join```
 
 => ```Joined domain DOMAIN1``` message is expected
+
+# TODO
+
+[ ] Add "Credits" for the materials I used
+[ ] Fix "cat: /var/lib/samba/private/krb5.conf: No such file or directory"
+[ ] Lock linux distr versions
