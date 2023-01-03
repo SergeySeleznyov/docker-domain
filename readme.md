@@ -7,17 +7,20 @@
 
 ## How to use
 
-1. ```start.cmd```
-2. ```connect-domain-controller.cmd```
+1. Run: ```start.cmd```
+2. Run: ```connect-domain-controller.cmd```
+
 In opened terminal run:
 $ ```/usr/local/sbin/samba-domain-provision```
 
-3. ```connect-react-nginx.cmd```
+3. Run: ```connect-react-nginx.cmd```
+
 In opened terminal run:
 $ ```/usr/local/sbin/samba-domain-join```
 => ```Joined domain DOMAIN1``` message is expected
 
-4. ```connect-apache-krb-proxy.cmd```
+4. Run: ```connect-apache-krb-proxy.cmd```
+
 In opened terminal run:
 In run: ```/usr/local/sbin/samba-domain-join```
 => ```Joined domain DOMAIN1``` message is expected
