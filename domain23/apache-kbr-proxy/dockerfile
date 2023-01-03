@@ -9,21 +9,16 @@ RUN apt update && apt upgrade -y && \
     netcat iputils-ping iproute2 -y
 
 # Install some dev-useful tools
-RUN apt install mc tmux -y
+RUN apt install mc tmux less vim -y
 
 # clean up
 RUN apt clean autoclean \
   && apt autoremove -y
 
 # TODO find a better solution
-# Workaround default smb.conf issue
-RUN rm /etc/samba/smb.conf \
-    && apt-get -f install
-
-# TODO find a better solution
 # Copy krb5.conf before it will be done by 'update-etc-files' script
-RUN mkdir -p /usr/local/samba/private/ \
-    && cp /etc/krb5.conf /usr/local/samba/private/
+# RUN mkdir -p /var/lib/samba/private/ \
+#     && cp /etc/krb5.conf /var/lib/samba/private/
 
 # Copy samba scripts
 RUN mkdir -p /usr/local/sbin

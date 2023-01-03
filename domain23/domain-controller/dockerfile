@@ -1,0 +1,27 @@
+FROM ubuntu
+
+# https://wiki.samba.org/index.php/Distribution-specific_Package_Installation#Debian.2FUbuntu
+RUN apt update && apt upgrade -y && \
+  DEBIAN_FRONTEND=noninteractive \
+  apt install \
+    acl attr samba samba-dsdb-modules samba-vfs-modules winbind libpam-winbind libnss-winbind krb5-config krb5-user dnsutils \
+    mc tmux curl vim iproute2 iputils-ping netcat iputils-ping less \
+    -y \
+  && apt clean autoclean \
+  && apt autoremove -y
+
+# Remove an existing /etc/krb5.conf file:
+# RUN rm /etc/krb5.conf
+# COPY ../samba-utils/krb5.conf /etc/krb5.conf
+
+# https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller
+# With the existing smb.conf file removed, provision a Samba AD ...
+RUN rm /etc/samba/smb.conf
+# (```samba-tool domain provision``` does not start if the ```/etc/samba/smb.conf``` was not deleted)
+
+WORKDIR /usr/local/sbin
+COPY ../samba-utils /usr/local/sbin
+# CMD bash -c "samba-domain-provision && samba -F"
+
+VOLUME /var/lib/samba
+EXPOSE 53 53/udp 88 88/udp 123/udp 135 137/udp 138/udp 139 389 389/udp 445 464 464/udp 636 3268 3269 49152-65535

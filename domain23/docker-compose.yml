@@ -1,0 +1,101 @@
+version: "3.8"
+
+services:
+  dc:
+    # restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ./domain-controller/dockerfile
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    container_name: dc
+    hostname: dc
+    privileged: true
+    environment:
+      REALM: DOMAIN1.NET
+      DOMAIN: DOMAIN1
+      ADMIN_PASS: Passw0rd
+      DNS_FORWARDER: 8.8.8.8
+    dns_search: domain1.net
+    dns:
+      - 172.16.240.10
+      - 172.16.240.20
+      - 172.16.240.30
+    extra_hosts:
+      - "dc dc.domain1.net:172.16.240.10"
+      - "krb-proxy krb-proxy.domain1.net:172.16.240.20"
+      - "react-nginx react-nginx.domain1.net:172.16.240.30"
+    # command: bash -c "samba-domain-provision && samba -F"
+    volumes:
+      - dc-local-samba:/var/lib/samba
+    networks:
+      static-network2:
+        ipv4_address: 172.16.240.10
+
+  krb-proxy:
+    depends_on:
+      - dc
+    build:
+      context: .
+      dockerfile: apache-kbr-proxy/dockerfile
+    container_name: krb-proxy
+    hostname: krb-proxy
+    privileged: true
+    environment:
+      REALM: DOMAIN1.NET
+      DOMAIN: DOMAIN1
+      ADMIN_PASS: Passw0rd
+      DNS_FORWARDER: 8.8.8.8
+      DC_HOSTNAME: dc
+    dns_search: domain1.net
+    dns:
+      - 172.16.240.10
+      - 172.16.240.20
+      - 172.16.240.30
+    extra_hosts:
+      - "dc dc.domain1.net:172.16.240.10"
+      - "krb-proxy krb-proxy.domain1.net:172.16.240.20"
+      - "react-nginx react-nginx.domain1.net:172.16.240.30"
+    # command: bash -c "samba-domain-join"
+    networks:
+      static-network2:
+        ipv4_address: 172.16.240.20
+
+  react-nginx:
+    depends_on:
+      - dc
+      - krb-proxy
+    build:
+      context: .
+      dockerfile: react-nginx/dockerfile
+    container_name: react-nginx
+    hostname: react-nginx
+    # privileged: true
+    environment:
+      REALM: DOMAIN1.NET
+      DOMAIN: DOMAIN1
+      ADMIN_PASS: Passw0rd
+      DNS_FORWARDER: 8.8.8.8
+      DC_HOSTNAME: dc
+    dns_search: domain1.net
+    dns:
+      - 172.16.240.10
+      - 172.16.240.20
+      - 172.16.240.30
+    extra_hosts:
+      - "dc dc.domain1.net:172.16.240.10"
+      - "krb-proxy krb-proxy.domain1.net:172.16.240.20"
+      - "react-nginx react-nginx.domain1.net:172.16.240.30"
+    # command: bash -c "samba-domain-join"
+    networks:
+      static-network2:
+        ipv4_address: 172.16.240.30
+
+volumes:
+  dc-local-samba:
+
+networks:
+  static-network2:
+    ipam:
+      config:
+        - subnet: 172.16.240.0/24

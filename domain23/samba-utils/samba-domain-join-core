@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+### Documentation
+### https://wiki.samba.org/index.php/Setting_up_Samba_as_a_Domain_Member
+
+# Exit if any error
+set -euo pipefail
+
+# Require DC as argument
+[[ "$#" -ge 1 ]] || { echo "Usage: samba-domain-join <server>"; exit 1; }
+server="$1"
+
+# Skip domain join if secrets exists
+if [[ ! -e "${SAMBA_PATH:-/var/lib/samba}/private/secrets.keytab" ]]; then
+
+  rm /etc/krb5.conf
+  cp /usr/local/sbin/krb5.conf /etc/krb5.conf
+
+  rm /etc/samba/smb.conf
+
+  # Wait until dc LDAP response
+  until nc -z "${server}" 389; do
+    echo "Waiting for ${server} LDAP response.."
+    sleep 1
+  done
+  INTERFACE=$(ip a | grep BROADCAST | head -n1 | awk '{print $2}' | sed 's/://')
+
+  samba-tool domain join "${REALM}" "${SERVER_ROLE:-MEMBER}" \
+    --server="${server}" \
+    --username=administrator \
+    --password="${ADMIN_PASS}" \
+    --dns-backend="${DNS_BACKEND:-SAMBA_INTERNAL}" \
+    --option="dns forwarder=${DNS_FORWARDER}"
+
+fi
+
+update-etc-files

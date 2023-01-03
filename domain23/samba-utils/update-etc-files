@@ -25,10 +25,11 @@ fi
 # Change krb5 file with compiled files
 if ! grep -q "${SEARCH_DOMAIN}" /etc/krb5.conf; then
   # The krb5.conf location is different from mirror and compiled from source files
-  cat "${SAMBA_PATH:-/usr/local/samba}/private/krb5.conf" >/etc/krb5.conf
+  cat "${SAMBA_PATH:-/var/lib/samba}/private/krb5.conf" >/etc/krb5.conf
 fi
 
 # Allow insecure LDAP requests
-if ! grep -q "ldap server require strong auth" /usr/local/samba/etc/smb.conf; then
-  sed -i 's/\[global\]/[global]\n\tldap server require strong auth = No/' /usr/local/samba/etc/smb.conf
-fi
+# На сервере не нужно
+# if ! grep -q "ldap server require strong auth" /var/lib/samba/etc/smb.conf; then
+#   sed -i 's/\[global\]/[global]\n\tldap server require strong auth = No/' /var/lib/samba/etc/smb.conf
+# fi

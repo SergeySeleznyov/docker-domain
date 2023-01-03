@@ -1,4 +1,4 @@
-pushd domain21
-docker compose up
+pushd domain23
+docker compose --verbose up --force-recreate
 popd
 pause

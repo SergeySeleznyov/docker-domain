@@ -1,4 +1,4 @@
-pushd domain21
+pushd domain23
 docker compose build
 popd
 

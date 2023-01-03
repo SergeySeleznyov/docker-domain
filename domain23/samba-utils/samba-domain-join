@@ -4,5 +4,5 @@ samba-domain-join-core ${DC_HOSTNAME}
 samba -F
 
 
-echo ${ADMIN_PASS} | kinit Administrator@${REALM}
-klist
+# echo ${ADMIN_PASS} | kinit Administrator@${REALM}
+# klist

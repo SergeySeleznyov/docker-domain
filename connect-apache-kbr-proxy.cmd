@@ -1,1 +1,1 @@
-docker exec -it apache-kbr-proxy bash
+docker exec -it kbr-proxy bash
