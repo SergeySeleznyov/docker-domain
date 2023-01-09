@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.4
 
 # 1. For build React app
-FROM localhost:8082/hydrogen-bullseye:lts AS development
+FROM localhost:8082/node:hydrogen-bullseye AS development
 
 # Set working directory
 WORKDIR /app
