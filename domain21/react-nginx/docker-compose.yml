@@ -1,7 +1,8 @@
 services:
   frontend:
     build:
-      context: .
+      context: ../.
+      dockerfile: ./react-nginx/dockerfile
     container_name: frontend
     ports:
       - "80:80"
