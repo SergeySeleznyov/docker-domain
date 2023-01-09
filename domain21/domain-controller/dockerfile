@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM localhost:8082/ubuntu:18.04
 
 # https://wiki.samba.org/index.php/Distribution-specific_Package_Installation#Debian.2FUbuntu
 RUN apt update && apt upgrade -y && \

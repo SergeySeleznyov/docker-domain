@@ -1,4 +1,4 @@
-FROM httpd:2.4-bullseye
+FROM localhost:8082/httpd:2.4-bullseye
 
 # Install samba, kerberos and required utils
 RUN apt update && apt upgrade -y && \
