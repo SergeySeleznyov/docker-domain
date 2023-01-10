@@ -47,18 +47,31 @@ CMD [ "npm", "start" ]
 FROM localhost:8082/nginx:1.23.3
 # Inside: debian:bullseye-slim
 
-RUN cat /etc/os-release
-
-# Install samba, kerberos and required utils
-RUN apt update && apt upgrade -y && \
-  DEBIAN_FRONTEND=noninteractive \
-  apt install \
-    samba \
-    krb5-user \
-    netcat iputils-ping iproute2 -y
+RUN apt update && apt upgrade -y\resources\wiki\start\topics\examples\full\
 
 # Install some dev-useful tools
-RUN apt install mc tmux less vim -y
+RUN apt install -y mc tmux less vim curl wget net-tools
+
+# RUN apt-get install -y nginx
+
+# Install nodejs
+# RUN apt install -y nodejs npm # Installs old version
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - &&\
+  apt install -y \
+    nodejs \
+     build-essential
+# https://github.com/nodesource/distributions/blob/master/README.md  
+
+# Install pm2
+RUN npm install pm2 -g
+# https://gist.github.com/tomasevich/a2fe588c451c5a192893e6521a813020
+
+# Install samba, kerberos and required utils
+RUN DEBIAN_FRONTEND=noninteractive \
+  apt install -y\
+    samba \
+    krb5-user \
+    netcat iputils-ping iproute2
 
 # clean up
 RUN apt clean autoclean \
@@ -82,17 +95,14 @@ WORKDIR /usr/share/nginx/html
 # Remove default nginx static assets
 RUN rm -rf ./*
 
-# Copy static assets from builder stage
-
-# For react-app 
-# COPY --from=build /app/build .
-
+# Copy static assets from builder/development stage
 # For rest-api-sample1
 COPY --from=development /app .
 
-RUN apt install -y nodejs npm
-RUN npm install pm2 -g
-# https://gist.github.com/tomasevich/a2fe588c451c5a192893e6521a813020
+# Run pm2
+RUN pm2 start app.js && \
+  pm2 save && \
+  pm2 startup
 
 # Containers run nginx with global directives and daemon off
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
