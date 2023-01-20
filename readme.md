@@ -22,6 +22,20 @@ In opened terminal run: ```/usr/local/sbin/samba-domain-join```
 
 => ```Joined domain DOMAIN1``` message is expected
 
+## Manual result test
+
+1. Run: ```connect-react-nginx.cmd``` or  ```connect-apache-krb-proxy.cmd```
+2. In opened terminal run: ```kinit administrator@DOMAIN1.NET```
+3. Enter password from ```docker-compose.yml``` file
+4.  run: ```klist```
+5. Result should be an info about domain joinung, something like that:
+
+```
+Valid starting     Expires            Service principal
+01/20/23 16:25:18  01/21/23 02:25:18  krbtgt/DOMAIN1.NET@DOMAIN1.NET
+        renew until 01/21/23 16:25:13
+```
+
 ## Useful docs
 
 * [Distribution-specific Package Installation](https://wiki.samba.org/index.php/Distribution-specific_Package_Installation#Debian.2FUbuntu)

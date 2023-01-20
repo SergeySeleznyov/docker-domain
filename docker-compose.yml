@@ -27,9 +27,9 @@ services:
       - "react-nginx react-nginx.domain1.net:172.16.240.30"
     # command: bash -c "samba-domain-provision && samba -F"
     volumes:
-      - domain21-local-samba:/var/lib/samba
+      - ./domain-controller-volume:/var/lib/samba
     networks:
-      domain21-static-network2:
+      domain-static-network2:
         ipv4_address: 172.16.240.10
 
   krb-proxy:
@@ -58,7 +58,7 @@ services:
       - "react-nginx react-nginx.domain1.net:172.16.240.30"
     # command: bash -c "samba-domain-join"
     networks:
-      domain21-static-network2:
+      domain-static-network2:
         ipv4_address: 172.16.240.20
 
   react-nginx:
@@ -88,14 +88,11 @@ services:
       - "react-nginx react-nginx.domain1.net:172.16.240.30"
     # command: bash -c "samba-domain-join"
     networks:
-      domain21-static-network2:
+      domain-static-network2:
         ipv4_address: 172.16.240.30
 
-volumes:
-  domain21-local-samba:
-
 networks:
-  domain21-static-network2:
+  domain-static-network2:
     ipam:
       config:
         - subnet: 172.16.240.0/24
